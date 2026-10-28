@@ -163,6 +163,14 @@ const dash = (() => {
 .fa-cc.total { background: var(--mc-green); border-color: var(--mc-green); border-top-color: var(--mc-yellow); }
 .fa-cc.total .l { color: #e7f0ec; }
 .fa-cc.total .v { color: var(--mc-yellow); }
+
+.fa-segs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: var(--cds-gap-md); }
+.fa-seg { background: var(--color-panel); border: 1px solid var(--color-border-line); border-top: 3px solid var(--mc-yellow); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; display: flex; flex-direction: column; gap: var(--cds-gap-sm); }
+.fa-seg h2 { margin: 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); color: var(--mc-accent); }
+.fa-segstats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--cds-gap-sm); }
+.fa-segstats div { display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
+.fa-segstats .l { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.fa-segstats .v { font-family: var(--font-anthropic-serif); font-size: 1.6rem; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--mc-accent); }
 </style>
 
 <div class="fa" id="fa-top">
@@ -179,6 +187,21 @@ const dash = (() => {
     <div class="fa-kpi"><span class="fa-klabel">Average age (months)</span><span class="fa-kval" data-draw="kpi" data-source="totals" data-row="0" data-field="avg_age_months" data-fmt="int">—</span></div>
     <div class="fa-kpi"><span class="fa-klabel">Oldest asset (months)</span><span class="fa-kval" data-draw="kpi" data-source="totals" data-row="0" data-field="oldest_months" data-fmt="int">—</span></div>
     <div class="fa-kpi"><span class="fa-klabel">Stores and locations</span><span class="fa-kval" data-draw="kpi" data-source="totals" data-row="0" data-field="stores" data-fmt="int">—</span></div>
+  </section>
+
+  <section class="fa-segs" id="fa-segs">
+    <div class="fa-seg" id="fa-seg-stores">
+      <div><h2>Stores</h2><p class="fa-note">Region 01 to Region 08</p></div>
+      <div class="fa-segstats"><div><span class="l">Assets</span><span class="v" data-draw="segv" data-source="segments" data-where="segment=Stores" data-seg="Stores" data-field="assets">—</span></div><div><span class="l">Average age (months)</span><span class="v" data-draw="segv" data-source="segments" data-where="segment=Stores" data-seg="Stores" data-field="avg_age_months">—</span></div><div><span class="l">Locations</span><span class="v" data-draw="segv" data-source="segments" data-where="segment=Stores" data-seg="Stores" data-field="locations">—</span></div></div>
+    </div>
+    <div class="fa-seg" id="fa-seg-distribution">
+      <div><h2>Distribution</h2><p class="fa-note">Distribution and Millwork</p></div>
+      <div class="fa-segstats"><div><span class="l">Assets</span><span class="v" data-draw="segv" data-source="segments" data-where="segment=Distribution" data-seg="Distribution" data-field="assets">—</span></div><div><span class="l">Average age (months)</span><span class="v" data-draw="segv" data-source="segments" data-where="segment=Distribution" data-seg="Distribution" data-field="avg_age_months">—</span></div><div><span class="l">Locations</span><span class="v" data-draw="segv" data-source="segments" data-where="segment=Distribution" data-seg="Distribution" data-field="locations">—</span></div></div>
+    </div>
+    <div class="fa-seg" id="fa-seg-headquarters">
+      <div><h2>Headquarters</h2><p class="fa-note">Fleet, Corporate and Store Development</p></div>
+      <div class="fa-segstats"><div><span class="l">Assets</span><span class="v" data-draw="segv" data-source="segments" data-where="segment=Headquarters" data-seg="Headquarters" data-field="assets">—</span></div><div><span class="l">Average age (months)</span><span class="v" data-draw="segv" data-source="segments" data-where="segment=Headquarters" data-seg="Headquarters" data-field="avg_age_months">—</span></div><div><span class="l">Locations</span><span class="v" data-draw="segv" data-source="segments" data-where="segment=Headquarters" data-seg="Headquarters" data-field="locations">—</span></div></div>
+    </div>
   </section>
 
   <section class="fa-grid" id="fa-breakdowns">
@@ -306,6 +329,19 @@ const dash = (() => {
       }];
     }
   });
+  dash.calc('segments', {
+    title: 'Assets by business segment', description: 'Asset count, average age and location count for Stores (Regions 01 to 08), Distribution (Distribution and Millwork) and Headquarters.',
+    inputs: ['assets'],
+    fn: (assets) => {
+      const segOf = (r) => /^Region 0[1-8]$/.test(r.region) ? 'Stores' : (r.region === 'Distribution' || r.region === 'Millwork') ? 'Distribution' : r.region === 'Headquarters' ? 'Headquarters' : 'Other';
+      const m = new Map(['Stores', 'Distribution', 'Headquarters', 'Other'].map((k) => [k, { segment: k, assets: 0, sum: 0, n: 0, locs: new Set() }]));
+      for (const r of assets) {
+        const g = m.get(segOf(r)); g.assets++; g.locs.add(r.store_number);
+        if (typeof r.age_months === 'number') { g.sum += r.age_months; g.n++; }
+      }
+      return [...m.values()].map((g) => ({ segment: g.segment, assets: g.assets, avg_age_months: g.n ? g.sum / g.n : 0, locations: g.locs.size }));
+    }
+  });
   dash.calc('by_region', {
     title: 'Assets by region', description: 'Asset count and average age per region.',
     inputs: ['assets'],
@@ -374,6 +410,13 @@ const dash = (() => {
   dash.draw('asof', (el) => {
     const g = dash.data('totals');
     el.textContent = (g.status === 'ok' && g.data[0] && g.data[0].report_date) ? fmtDate(new Date(g.data[0].report_date)) : '—';
+  });
+
+  dash.draw('segv', (el) => {
+    const g = dash.data('segments');
+    const row = g.status === 'ok' ? g.data.find((r) => r.segment === el.dataset.seg) : null;
+    const v = row ? row[el.dataset.field] : null;
+    el.textContent = (typeof v === 'number') ? fmtInt(Math.round(v)) : '—';
   });
 
   dash.draw('kpi', (el) => {
