@@ -1,0 +1,550 @@
+<meta name="dash-one-writer">
+<style>
+.fa { max-width: 1400px; margin-inline: auto; display: flex; flex-direction: column; gap: var(--cds-gap-lg); font-family: var(--font-anthropic-sans); }
+.fa * { box-sizing: border-box; }
+.fa-title { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: 1.75rem; margin: 0; }
+.fa-sub { margin: .25rem 0 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-body); max-width: 70ch; }
+.fa-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--cds-gap-md); }
+.fa-kpi { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
+.fa-klabel { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.fa-kval { font-family: var(--font-anthropic-serif); font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.fa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: var(--cds-gap-md); }
+.fa-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; display: flex; flex-direction: column; gap: var(--cds-gap-sm); }
+.fa-card h2 { margin: 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+.fa-note { margin: 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.fa-bars { display: flex; flex-direction: column; gap: 2px; min-height: 8rem; }
+.fa-bar { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 7.5rem 1fr 3.5rem 4.5rem; gap: .5rem; align-items: center; padding: .2rem .35rem; border-radius: 4px; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.fa-bar:hover { background: var(--cds-surface-hover, rgba(127,127,127,.12)); }
+.fa-bar:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 1px; }
+.fa-bar[aria-pressed="true"] { background: rgba(127,127,127,.18); font-weight: 600; }
+.fa-bar .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fa-bar .tr { height: .6rem; background: rgba(127,127,127,.15); border-radius: 3px; overflow: hidden; }
+.fa-bar .tr i { display: block; height: 100%; background: var(--cds-chart-1, #4a7fd4); border-radius: 3px; }
+.fa-bar .ct, .fa-bar .av { text-align: right; }
+.fa-bar .av { color: var(--color-fg-muted); }
+.fa-barhead { display: grid; grid-template-columns: 7.5rem 1fr 3.5rem 4.5rem; gap: .5rem; padding: 0 .35rem; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.fa-barhead span:nth-child(3), .fa-barhead span:nth-child(4) { text-align: right; }
+.fa-filters { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: end; }
+.fa-field { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.fa-field select, .fa-field input { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg); background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: 6px; padding: .35rem .5rem; min-width: 9rem; max-width: 14rem; }
+.fa-field input { min-width: 12rem; }
+.fa-clear { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg); background: transparent; border: 1px solid var(--color-border-line); border-radius: 6px; padding: .35rem .75rem; cursor: pointer; }
+.fa-clear:hover { background: rgba(127,127,127,.12); }
+.fa-count { font-size: var(--cds-font-size-body); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.fa-scroll { overflow: auto; max-height: 70vh; border: 1px solid var(--color-border-line); border-radius: 6px; }
+.fa-table { border-collapse: collapse; width: 100%; font-size: var(--cds-font-size-body); font-variant-numeric: tabular-nums; }
+.fa-table th { position: sticky; top: 0; background: var(--color-panel); z-index: 1; text-align: left; font-weight: 600; font-size: var(--cds-font-size-caption); padding: .5rem .6rem; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; cursor: pointer; user-select: none; }
+.fa-table th[aria-sort="ascending"]::after { content: " \25B2"; font-size: .7em; }
+.fa-table th[aria-sort="descending"]::after { content: " \25BC"; font-size: .7em; }
+.fa-table th.num, .fa-table td.num { text-align: right; }
+.fa-table td { padding: .4rem .6rem; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.fa-table tbody tr:hover td { background: rgba(127,127,127,.08); }
+.fa-age { display: inline-flex; align-items: center; gap: .5rem; justify-content: flex-end; width: 100%; }
+.fa-age .tr { width: 4rem; height: .45rem; background: rgba(127,127,127,.15); border-radius: 3px; overflow: hidden; }
+.fa-age .tr i { display: block; height: 100%; background: var(--cds-chart-1, #4a7fd4); }
+.fa-age .tr i.old { background: var(--color-warn); }
+.fa-age b { font-weight: 500; min-width: 2.2rem; text-align: right; }
+.fa-table tbody tr.fa-grp td { position: sticky; top: 2rem; background: var(--mc-tint); color: var(--color-fg); padding: .35rem .6rem; border-bottom: 1px solid var(--color-border-line); }
+.fa-grp td { display: table-cell; }
+.fa-grp i { margin-right: .5rem; vertical-align: -1px; }
+.fa-grp b { margin-right: .75rem; font-weight: 600; color: var(--mc-accent); }
+.fa-grp span { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.fa-empty td { text-align: center; color: var(--color-fg-muted); padding: 2rem; }
+[data-dash-source-state=empty] { color: transparent; }
+@media (max-width: 600px) { .fa-bar, .fa-barhead { grid-template-columns: 6rem 1fr 3rem 3.5rem; } .fa-field select, .fa-field input { max-width: 100%; min-width: 8rem; } }
+</style>
+
+<style>
+/* McCoy's theme: green #0d5540, yellow #ffe900 from the company logo */
+.fa { --mc-green: #0d5540; --mc-yellow: #ffe900; --mc-accent: #0d5540; --mc-accent-fg: #ffffff; --mc-tint: #e3efe9; --mc-hl: #fff6a8; --mc-bar: #0d5540; --mc-th: #e3efe9; --mc-th-fg: #0d5540; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fa { --mc-accent: #ffe900; --mc-tint: #123d31; --mc-hl: #3a4a12; --mc-bar: #ffe900; --mc-th: #123d31; --mc-th-fg: #ffe900; } }
+:root[data-theme="dark"] .fa { --mc-accent: #ffe900; --mc-tint: #123d31; --mc-hl: #3a4a12; --mc-bar: #ffe900; --mc-th: #123d31; --mc-th-fg: #ffe900; }
+.fa-band { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; background: var(--mc-green); color: #fff; border-radius: var(--cds-radius); padding: .9rem 1.25rem; border-bottom: 4px solid var(--mc-yellow); }
+.fa-logo { display: block; height: 4rem; width: auto; max-width: 100%; }
+.fa-band-text { min-width: 0; flex: 1 1 18rem; }
+.fa-band .fa-title { color: var(--mc-yellow); }
+.fa-band .fa-sub { color: #e7f0ec; margin-top: .15rem; }
+.fa-band .fa-sub b { color: var(--mc-yellow); }
+.fa-kval { color: var(--mc-accent); }
+.fa-card h2 { color: var(--mc-accent); }
+.fa-bar .tr i, .fa-age .tr i { background: var(--mc-bar); }
+.fa-bar:hover { background: var(--mc-tint); }
+.fa-bar[aria-pressed="true"] { background: var(--mc-hl); }
+.fa-bar:focus-visible, .fa-field select:focus-visible, .fa-field input:focus-visible, .fa-clear:focus-visible { outline: 2px solid var(--mc-accent); outline-offset: 1px; }
+.fa-table th { background: var(--mc-th); color: var(--mc-th-fg); border-bottom: 2px solid var(--mc-accent); }
+.fa-table tbody tr:hover td { background: var(--mc-tint); }
+.fa-clear { background: var(--mc-green); color: var(--mc-yellow); border-color: var(--mc-green); font-weight: 600; }
+.fa-clear:hover { background: var(--mc-green); filter: brightness(1.2); }
+.fa-kpi { border-top: 3px solid var(--mc-yellow); }
+
+.fa-legend { display: flex; flex-wrap: wrap; gap: .25rem .9rem; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); min-height: 1.2rem; }
+.fa-legend span { display: inline-flex; align-items: center; gap: .35rem; }
+.fa-sw { width: .75rem; height: .75rem; border-radius: 2px; display: inline-block; box-shadow: inset 0 0 0 1px rgba(127,127,127,.45); flex: none; }
+.fa-rrow { display: grid; grid-template-columns: 1.5rem 6.5rem 1fr 3.25rem 4rem; gap: .4rem; align-items: center; padding: .2rem .35rem; border-radius: 4px; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.fa-rrow[aria-current="true"] { background: var(--mc-hl); }
+.fa-rrow .nm { all: unset; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: inherit; }
+.fa-rrow[aria-current="true"] .nm { font-weight: 600; }
+.fa-rrow .nm:hover { text-decoration: underline; }
+.fa-rrow .nm:focus-visible, .fa-caret:focus-visible { outline: 2px solid var(--mc-accent); outline-offset: 1px; }
+.fa-caret { all: unset; cursor: pointer; width: 1.5rem; height: 1.5rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; color: var(--mc-accent); }
+.fa-caret:hover { background: var(--mc-tint); }
+.fa-caret svg { width: .8rem; height: .8rem; transition: transform .15s; }
+.fa-caret[aria-expanded="true"] svg { transform: rotate(90deg); }
+.fa-stack { display: flex; height: .9rem; border-radius: 3px; overflow: hidden; background: rgba(127,127,127,.12); }
+.fa-stack i { display: block; height: 100%; cursor: pointer; box-shadow: inset -1px 0 0 rgba(127,127,127,.35); }
+.fa-rrow .ct, .fa-rrow .av { text-align: right; }
+.fa-rrow .av { color: var(--color-fg-muted); }
+.fa-detail { margin: 0 .35rem .35rem 2.1rem; padding: .4rem .6rem; background: var(--mc-tint); border-radius: 4px; display: grid; gap: .15rem; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.fa-detail div { display: grid; grid-template-columns: .75rem 1fr 3rem 3rem; gap: .5rem; align-items: center; }
+.fa-detail .n, .fa-detail .p { text-align: right; }
+.fa-detail .p { color: var(--color-fg-muted); }
+.fa-detail .cls { all: unset; cursor: pointer; }
+.fa-detail .cls:hover { text-decoration: underline; }
+.fa-detail .cls:focus-visible { outline: 2px solid var(--mc-accent); }
+.fa-rhead { display: grid; grid-template-columns: 1.5rem 6.5rem 1fr 3.25rem 4rem; gap: .4rem; padding: 0 .35rem; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.fa-rhead span:nth-child(4), .fa-rhead span:nth-child(5) { text-align: right; }
+@media (max-width: 600px) { .fa-rrow, .fa-rhead { grid-template-columns: 1.5rem 5rem 1fr 2.75rem 3.25rem; } }
+
+.fa-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr)); gap: var(--cds-gap-sm); min-height: 4.5rem; }
+.fa-cc { background: var(--color-bg); border: 1px solid var(--color-border-line); border-top: 4px solid var(--cc, var(--mc-yellow)); border-radius: 6px; padding: .5rem .7rem; display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
+.fa-cc .l { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fa-cc .v { font-family: var(--font-anthropic-serif); font-size: 1.6rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.fa-cc .a { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.fa-cc.zero { opacity: .45; }
+.fa-cc.total .a { color: #e7f0ec; }
+.fa-cc.total { background: var(--mc-green); border-color: var(--mc-green); border-top-color: var(--mc-yellow); }
+.fa-cc.total .l { color: #e7f0ec; }
+.fa-cc.total .v { color: var(--mc-yellow); }
+</style>
+
+<div class="fa" id="fa-top">
+  <header class="fa-band">
+    <img class="fa-logo" alt="McCoy's Building Supply" src="data:image/png;base64,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">
+    <div class="fa-band-text">
+      <h1 class="fa-title">Fleet asset report</h1>
+      <p class="fa-sub">Fexa daily fleet asset export for the report dated <b data-draw="asof" data-source="totals" data-row="0" data-field="report_date">—</b>. Age is whole months from the in-service date to the report date. Click a region or class to filter the list.</p>
+    </div>
+  </header>
+
+  <section class="fa-kpis" id="fa-kpis">
+    <div class="fa-kpi"><span class="fa-klabel">Assets</span><span class="fa-kval" data-draw="kpi" data-source="totals" data-row="0" data-field="assets" data-fmt="int">—</span></div>
+    <div class="fa-kpi"><span class="fa-klabel">Average age (months)</span><span class="fa-kval" data-draw="kpi" data-source="totals" data-row="0" data-field="avg_age_months" data-fmt="int">—</span></div>
+    <div class="fa-kpi"><span class="fa-klabel">Oldest asset (months)</span><span class="fa-kval" data-draw="kpi" data-source="totals" data-row="0" data-field="oldest_months" data-fmt="int">—</span></div>
+    <div class="fa-kpi"><span class="fa-klabel">Stores and locations</span><span class="fa-kval" data-draw="kpi" data-source="totals" data-row="0" data-field="stores" data-fmt="int">—</span></div>
+  </section>
+
+  <section class="fa-grid" id="fa-breakdowns">
+    <div class="fa-card" id="fa-by-region">
+      <h2>Assets by region</h2>
+      <p class="fa-note">Each bar is split by asset class. Use the arrow to see the count by class, or click a region or color to filter the list.</p>
+      <div class="fa-legend" data-draw="legend" data-source="by_class"></div>
+      <div class="fa-rhead"><span></span><span>Region</span><span></span><span>Assets</span><span>Avg age</span></div>
+      <div class="fa-bars" data-draw="rbars" data-source="by_region region_class by_class"></div>
+    </div>
+    <div class="fa-card" id="fa-by-class">
+      <h2>Assets by class</h2>
+      <p class="fa-note">Class comes from the asset class key, matched on asset template name. Each bar is split by template in shades of the class color. Use the arrow to see the count by template.</p>
+      <div class="fa-rhead"><span></span><span>Class</span><span></span><span>Assets</span><span>Avg age</span></div>
+      <div class="fa-bars" data-draw="cbars" data-source="by_class class_template"></div>
+    </div>
+  </section>
+
+  <section class="fa-card" id="fa-list">
+    <h2>Asset list</h2>
+    <div class="fa-filters">
+      <label class="fa-field" for="fa-q">Search<input id="fa-q" type="search" placeholder="Asset number, template, serial, store"></label>
+      <label class="fa-field" for="fa-f-region">Region<select id="fa-f-region" data-draw="sel" data-fcol="region" data-all="All regions" data-source="assets"></select></label>
+      <label class="fa-field" for="fa-f-store">Store<select id="fa-f-store" data-draw="sel" data-fcol="store" data-all="All stores" data-source="assets"></select></label>
+      <label class="fa-field" for="fa-f-class">Asset class<select id="fa-f-class" data-draw="sel" data-fcol="asset_class" data-all="All classes" data-source="assets"></select></label>
+      <label class="fa-field" for="fa-f-tpl">Asset template<select id="fa-f-tpl" data-draw="sel" data-fcol="asset_name" data-all="All templates" data-source="assets"></select></label>
+      <label class="fa-field" for="fa-f-mfr">Manufacturer<select id="fa-f-mfr" data-draw="sel" data-fcol="manufacturer" data-all="All manufacturers" data-source="assets"></select></label>
+      <label class="fa-field" for="fa-f-status">Status<select id="fa-f-status" data-draw="sel" data-fcol="status" data-all="All statuses" data-source="assets"></select></label>
+      <label class="fa-field" for="fa-f-own">Ownership<select id="fa-f-own" data-draw="sel" data-fcol="ownership" data-all="All ownership" data-source="assets"></select></label>
+      <button class="fa-clear" id="fa-clear" type="button">Clear filters</button>
+    </div>
+    <div class="fa-cards" data-draw="classcards" data-source="assets by_class"></div>
+    <div class="fa-count" data-draw="count" data-source="assets">—</div>
+    <div class="fa-scroll">
+      <table class="fa-table" id="fa-table" data-source="assets" data-row-key="asset_number">
+        <thead>
+          <tr>
+            <th data-field="region">Region</th>
+            <th data-field="store">Store</th>
+            <th data-field="asset_class">Asset class</th>
+            <th data-field="asset_name">Asset template name</th>
+            <th data-field="asset_number">Asset number</th>
+            <th data-field="manufacturer">Manufacturer</th>
+            <th data-field="serial_number">Serial number</th>
+            <th data-field="status">Status</th>
+            <th data-field="in_service_date">In service</th>
+            <th class="num" data-field="age_months">Age (months)</th>
+          </tr>
+        </thead>
+        <tbody data-draw="rows"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Shared filter and sort state for this page.
+  const fa = window.fa = { f: {}, q: '', sort: 'age_months', dir: -1 };
+  const COLS = ['region','store','asset_class','asset_name','asset_number','manufacturer','serial_number','status','in_service_date','age_months'];
+  const fmtInt = d3.format(',');
+  const fmtDate = d3.utcFormat('%b %-d, %Y');
+
+  fa.all = () => { const g = dash.data('assets'); return g.status === 'ok' ? g.data : []; };
+  fa.match = (r, skip) => {
+    for (const k in fa.f) if (fa.f[k] && k !== skip && r[k] !== fa.f[k]) return false;
+    if (fa.q) {
+      const t = (r.asset_number + ' ' + r.asset_name + ' ' + r.serial_number + ' ' + r.store + ' ' + r.manufacturer + ' ' + r.asset_class).toLowerCase();
+      if (!t.includes(fa.q)) return false;
+    }
+    return true;
+  };
+  fa.rank = () => { const g = dash.data('by_class'); const m = new Map(); if (g.status === 'ok') g.data.forEach((d, i) => m.set(d.name, i)); return m; };
+  fa.rows = () => {
+    const out = fa.all().filter((r) => fa.match(r));
+    const k = fa.sort, d = fa.dir, rk = fa.rank();
+    const cr = (r) => (rk.has(r.asset_class) ? rk.get(r.asset_class) : 999);
+    out.sort((a, b) => {
+      const g = (cr(a) - cr(b)) * (k === 'asset_class' ? d : 1);
+      if (g) return g;
+      if (k === 'asset_class') return String(a.asset_number).localeCompare(String(b.asset_number), 'en', { numeric: true });
+      const x = a[k], y = b[k];
+      const c = (typeof x === 'number' && typeof y === 'number') ? x - y : String(x).localeCompare(String(y), 'en', { numeric: true });
+      return c * d || String(a.asset_number).localeCompare(String(b.asset_number), 'en', { numeric: true });
+    });
+    return out;
+  };
+  fa.refresh = () => {
+    if (fa.f.asset_name && !fa.all().some((r) => r.asset_name === fa.f.asset_name && (!fa.f.asset_class || r.asset_class === fa.f.asset_class))) fa.f.asset_name = '';
+    dash.draw('rows'); dash.draw('count'); dash.draw('classcards'); dash.draw('cbars'); dash.draw('rbars'); dash.draw('sel');
+  };
+
+  // Search box
+  document.getElementById('fa-q').addEventListener('input', (e) => { fa.q = e.target.value.trim().toLowerCase(); dash.draw('rows'); dash.draw('count'); dash.draw('classcards'); });
+
+  // Clear button
+  document.getElementById('fa-clear').addEventListener('click', () => {
+    fa.f = {}; fa.q = ''; document.getElementById('fa-q').value = ''; fa.refresh();
+  });
+
+  // Sortable headers
+  document.querySelectorAll('#fa-table th').forEach((th) => {
+    th.addEventListener('click', () => {
+      const k = th.dataset.field;
+      if (fa.sort === k) fa.dir = -fa.dir; else { fa.sort = k; fa.dir = (k === 'age_months') ? -1 : 1; }
+      document.querySelectorAll('#fa-table th').forEach((h) => h.removeAttribute('aria-sort'));
+      th.setAttribute('aria-sort', fa.dir === 1 ? 'ascending' : 'descending');
+      dash.draw('rows');
+    });
+  });
+  document.querySelector('#fa-table th[data-field="age_months"]').setAttribute('aria-sort', 'descending');
+
+  // Summary calculations
+  dash.calc('totals', {
+    title: 'Fleet totals', description: 'Asset count, average and oldest age, and location count from the asset list.',
+    inputs: ['assets'],
+    fn: (assets) => {
+      const ages = assets.map((r) => r.age_months).filter((n) => typeof n === 'number');
+      const dates = assets.map((r) => r.report_date).sort();
+      return [{
+        report_date: dates.length ? dates[dates.length - 1] : '',
+        assets: assets.length,
+        avg_age_months: ages.length ? ages.reduce((s, n) => s + n, 0) / ages.length : 0,
+        oldest_months: ages.length ? Math.max(...ages) : 0,
+        stores: new Set(assets.map((r) => r.store_number)).size
+      }];
+    }
+  });
+  dash.calc('by_region', {
+    title: 'Assets by region', description: 'Asset count and average age per region.',
+    inputs: ['assets'],
+    fn: (assets) => {
+      const m = new Map();
+      for (const r of assets) {
+        const g = m.get(r.region) || { name: r.region, assets: 0, sum: 0, n: 0 };
+        g.assets++; if (typeof r.age_months === 'number') { g.sum += r.age_months; g.n++; }
+        m.set(r.region, g);
+      }
+      return [...m.values()].map((g) => ({ name: g.name, assets: g.assets, avg_age_months: g.n ? g.sum / g.n : 0 }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
+  });
+  dash.calc('by_class', {
+    title: 'Assets by class', description: 'Asset count and average age per asset class.',
+    inputs: ['assets'],
+    fn: (assets) => {
+      const m = new Map();
+      for (const r of assets) {
+        const g = m.get(r.asset_class) || { name: r.asset_class, assets: 0, sum: 0, n: 0 };
+        g.assets++; if (typeof r.age_months === 'number') { g.sum += r.age_months; g.n++; }
+        m.set(r.asset_class, g);
+      }
+      return [...m.values()].map((g) => ({ name: g.name, assets: g.assets, avg_age_months: g.n ? g.sum / g.n : 0 }))
+        .sort((a, b) => b.assets - a.assets);
+    }
+  });
+
+  dash.calc('region_class', {
+    title: 'Assets by region and class', description: 'Asset count for each region and asset class.',
+    inputs: ['assets'],
+    fn: (assets) => {
+      const m = new Map();
+      for (const r of assets) {
+        const k = r.region + '|' + r.asset_class;
+        const g = m.get(k) || { region: r.region, asset_class: r.asset_class, assets: 0 };
+        g.assets++; m.set(k, g);
+      }
+      return [...m.values()].sort((a, b) => a.region.localeCompare(b.region) || b.assets - a.assets);
+    }
+  });
+
+  dash.calc('class_template', {
+    title: 'Assets by class and template', description: 'Asset count and average age for each asset template within its class.',
+    inputs: ['assets'],
+    fn: (assets) => {
+      const m = new Map();
+      for (const r of assets) {
+        const k = r.asset_class + '|' + r.asset_name;
+        const g = m.get(k) || { asset_class: r.asset_class, template: r.asset_name, assets: 0, sum: 0, n: 0 };
+        g.assets++; if (typeof r.age_months === 'number') { g.sum += r.age_months; g.n++; }
+        m.set(k, g);
+      }
+      return [...m.values()].map((g) => ({ asset_class: g.asset_class, template: g.template, assets: g.assets, avg_age_months: g.n ? g.sum / g.n : 0 }))
+        .sort((a, b) => a.asset_class.localeCompare(b.asset_class) || b.assets - a.assets || a.template.localeCompare(b.template));
+    }
+  });
+
+  // Class colors (shared by the legend, the region bars and the detail rows)
+  const CLASS_COLORS = { 'Forklift': '#0d5540', 'Truck': '#ffe900', 'Trailer': '#4f9a78', 'TMFL': '#b79b00', 'LD Vehicle': '#a8d5bf', 'Ancillary Fleet': '#6f7358' };
+  const classColor = (c) => CLASS_COLORS[c] || '#9aa39e';
+  fa.open = new Set(); fa.openC = new Set();
+
+  // Drawings
+  dash.draw('asof', (el) => {
+    const g = dash.data('totals');
+    el.textContent = (g.status === 'ok' && g.data[0] && g.data[0].report_date) ? fmtDate(new Date(g.data[0].report_date)) : '—';
+  });
+
+  dash.draw('kpi', (el) => {
+    const g = dash.data('totals');
+    const v = g.status === 'ok' && g.data[0] ? g.data[0][el.dataset.field] : null;
+    el.textContent = (typeof v === 'number') ? fmtInt(Math.round(v)) : '—';
+  });
+
+  dash.draw('legend', (el) => {
+    const g = dash.data('by_class');
+    if (g.status !== 'ok') { el.replaceChildren(); return; }
+    const frag = document.createDocumentFragment();
+    for (const d of g.data) {
+      const sp = document.createElement('span');
+      const sw = document.createElement('i'); sw.className = 'fa-sw'; sw.style.background = classColor(d.name);
+      sp.append(sw, document.createTextNode(d.name)); frag.appendChild(sp);
+    }
+    el.replaceChildren(frag);
+  });
+
+  dash.draw('rbars', (el) => {
+    const reg = dash.data('by_region'), rc = dash.data('region_class'), cl = dash.data('by_class');
+    if (reg.status !== 'ok' || rc.status !== 'ok' || cl.status !== 'ok') { el.replaceChildren(); return; }
+    const order = cl.data.map((d) => d.name);
+    const max = d3.max(reg.data, (d) => d.assets) || 1;
+    const pct = d3.format('.0%');
+    const frag = document.createDocumentFragment();
+    const goto = () => { fa.refresh(); const list = document.getElementById('fa-list'); if (list) list.scrollIntoView({ block: 'start' }); };
+    for (const d of reg.data) {
+      const parts = rc.data.filter((r) => r.region === d.name).sort((a, b) => order.indexOf(a.asset_class) - order.indexOf(b.asset_class));
+      const row = document.createElement('div'); row.className = 'fa-rrow';
+      row.setAttribute('aria-current', fa.f.region === d.name ? 'true' : 'false');
+      const open = fa.open.has(d.name);
+      const caret = document.createElement('button'); caret.type = 'button'; caret.className = 'fa-caret';
+      caret.setAttribute('aria-expanded', open ? 'true' : 'false'); caret.setAttribute('aria-label', 'Count by class for ' + d.name);
+      caret.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      caret.addEventListener('click', () => { if (fa.open.has(d.name)) fa.open.delete(d.name); else fa.open.add(d.name); dash.draw('rbars'); });
+      const nm = document.createElement('button'); nm.type = 'button'; nm.className = 'nm'; nm.textContent = d.name;
+      nm.addEventListener('click', () => { fa.f.region = (fa.f.region === d.name) ? '' : d.name; fa.f.asset_class = ''; if (fa.f.store && !fa.all().some((r) => r.region === fa.f.region && r.store === fa.f.store)) fa.f.store = ''; goto(); });
+      const stack = document.createElement('div'); stack.className = 'fa-stack'; stack.style.width = (100 * d.assets / max) + '%';
+      for (const p of parts) {
+        const seg = document.createElement('i'); seg.style.width = (100 * p.assets / d.assets) + '%'; seg.style.background = classColor(p.asset_class);
+        seg.title = d.name + ' · ' + p.asset_class + ': ' + fmtInt(p.assets);
+        seg.addEventListener('click', () => { fa.f.region = d.name; fa.f.asset_class = p.asset_class; if (fa.f.store && !fa.all().some((r) => r.region === d.name && r.store === fa.f.store)) fa.f.store = ''; goto(); });
+        stack.appendChild(seg);
+      }
+      const ct = document.createElement('span'); ct.className = 'ct'; ct.textContent = fmtInt(d.assets);
+      const av = document.createElement('span'); av.className = 'av'; av.textContent = fmtInt(Math.round(d.avg_age_months));
+      const track = document.createElement('div'); track.appendChild(stack);
+      row.append(caret, nm, track, ct, av); frag.appendChild(row);
+      if (open) {
+        const det = document.createElement('div'); det.className = 'fa-detail';
+        for (const p of parts) {
+          const line = document.createElement('div');
+          const sw = document.createElement('i'); sw.className = 'fa-sw'; sw.style.background = classColor(p.asset_class);
+          const cn = document.createElement('button'); cn.type = 'button'; cn.className = 'cls'; cn.textContent = p.asset_class;
+          cn.addEventListener('click', () => { fa.f.region = d.name; fa.f.asset_class = p.asset_class; if (fa.f.store && !fa.all().some((r) => r.region === d.name && r.store === fa.f.store)) fa.f.store = ''; goto(); });
+          const n = document.createElement('span'); n.className = 'n'; n.textContent = fmtInt(p.assets);
+          const pc = document.createElement('span'); pc.className = 'p'; pc.textContent = pct(p.assets / d.assets);
+          line.append(sw, cn, n, pc); det.appendChild(line);
+        }
+        frag.appendChild(det);
+      }
+    }
+    el.replaceChildren(frag);
+  });
+
+  dash.draw('cbars', (el) => {
+    const cl = dash.data('by_class'), ct2 = dash.data('class_template');
+    if (cl.status !== 'ok' || ct2.status !== 'ok') { el.replaceChildren(); return; }
+    const max = d3.max(cl.data, (d) => d.assets) || 1;
+    const pct = d3.format('.0%');
+    const frag = document.createDocumentFragment();
+    const goto = () => { fa.refresh(); const list = document.getElementById('fa-list'); if (list) list.scrollIntoView({ block: 'start' }); };
+    for (const d of cl.data) {
+      const parts = ct2.data.filter((r) => r.asset_class === d.name);
+      const base = d3.hsl(classColor(d.name));
+      const shade = (i) => d3.hsl(base.h, Math.max(base.s, 0.35), 0.28 + 0.5 * (parts.length > 1 ? i / (parts.length - 1) : 0.4)).formatHex();
+      const row = document.createElement('div'); row.className = 'fa-rrow';
+      row.setAttribute('aria-current', (fa.f.asset_class === d.name && !fa.f.asset_name) ? 'true' : 'false');
+      const open = fa.openC.has(d.name);
+      const caret = document.createElement('button'); caret.type = 'button'; caret.className = 'fa-caret';
+      caret.setAttribute('aria-expanded', open ? 'true' : 'false'); caret.setAttribute('aria-label', 'Count by template for ' + d.name);
+      caret.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      caret.addEventListener('click', () => { if (fa.openC.has(d.name)) fa.openC.delete(d.name); else fa.openC.add(d.name); dash.draw('cbars'); });
+      const nm = document.createElement('button'); nm.type = 'button'; nm.className = 'nm'; nm.textContent = d.name;
+      nm.addEventListener('click', () => { fa.f.asset_class = (fa.f.asset_class === d.name && !fa.f.asset_name) ? '' : d.name; fa.f.asset_name = ''; goto(); });
+      const stack = document.createElement('div'); stack.className = 'fa-stack'; stack.style.width = (100 * d.assets / max) + '%';
+      parts.forEach((p, i) => {
+        const seg = document.createElement('i'); seg.style.width = (100 * p.assets / d.assets) + '%'; seg.style.background = shade(i);
+        seg.title = p.template + ': ' + fmtInt(p.assets);
+        seg.addEventListener('click', () => { fa.f.asset_class = d.name; fa.f.asset_name = p.template; goto(); });
+        stack.appendChild(seg);
+      });
+      const ct = document.createElement('span'); ct.className = 'ct'; ct.textContent = fmtInt(d.assets);
+      const av = document.createElement('span'); av.className = 'av'; av.textContent = fmtInt(Math.round(d.avg_age_months));
+      const track = document.createElement('div'); track.appendChild(stack);
+      row.append(caret, nm, track, ct, av); frag.appendChild(row);
+      if (open) {
+        const det = document.createElement('div'); det.className = 'fa-detail';
+        parts.forEach((p, i) => {
+          const line = document.createElement('div');
+          const sw = document.createElement('i'); sw.className = 'fa-sw'; sw.style.background = shade(i);
+          const cn = document.createElement('button'); cn.type = 'button'; cn.className = 'cls'; cn.textContent = p.template;
+          cn.addEventListener('click', () => { fa.f.asset_class = d.name; fa.f.asset_name = p.template; goto(); });
+          const n = document.createElement('span'); n.className = 'n'; n.textContent = fmtInt(p.assets);
+          const pc = document.createElement('span'); pc.className = 'p'; pc.textContent = pct(p.assets / d.assets);
+          line.append(sw, cn, n, pc); det.appendChild(line);
+        });
+        frag.appendChild(det);
+      }
+    }
+    el.replaceChildren(frag);
+  });
+
+  dash.draw('sel', (sel) => {
+    const g = dash.data('assets');
+    const col = sel.dataset.fcol;
+    if (g.status !== 'ok') { sel.replaceChildren(new Option(sel.dataset.all, '')); return; }
+    const vals = [...new Set(g.data.filter((r) => fa.match(r, col) && (col !== 'store' || !fa.f.region || r.region === fa.f.region)).map((r) => r[col]))]
+      .sort((a, b) => String(a).localeCompare(String(b), 'en', { numeric: true }));
+    const cur = fa.f[col] || '';
+    if (cur && !vals.includes(cur)) vals.push(cur);
+    sel.replaceChildren(new Option(sel.dataset.all, ''), ...vals.map((v) => new Option(v, v)));
+    sel.value = cur;
+    sel.onchange = () => {
+      fa.f[col] = sel.value;
+      if (col === 'region' && fa.f.store && !fa.all().some((r) => r.region === fa.f.region && r.store === fa.f.store)) fa.f.store = '';
+      fa.refresh();
+    };
+  });
+
+  dash.draw('classcards', (el) => {
+    const cl = dash.data('by_class');
+    if (cl.status !== 'ok' || !fa.all().length) { el.replaceChildren(); return; }
+    const rows = fa.rows();
+    const agg = new Map();
+    for (const r of rows) {
+      const g = agg.get(r.asset_class) || { n: 0, sum: 0, k: 0 };
+      g.n++; if (typeof r.age_months === 'number') { g.sum += r.age_months; g.k++; }
+      agg.set(r.asset_class, g);
+    }
+    const tot = rows.reduce((a, r) => { if (typeof r.age_months === 'number') { a.sum += r.age_months; a.k++; } return a; }, { sum: 0, k: 0 });
+    const frag = document.createDocumentFragment();
+    const mk = (label, n, avg, color, cls) => {
+      const c = document.createElement('div'); c.className = 'fa-cc' + (cls ? ' ' + cls : '') + (n === 0 && cls !== 'total' ? ' zero' : '');
+      if (color) c.style.setProperty('--cc', color);
+      const l = document.createElement('span'); l.className = 'l'; l.textContent = label;
+      const v = document.createElement('span'); v.className = 'v'; v.textContent = fmtInt(n);
+      const a = document.createElement('span'); a.className = 'a'; a.textContent = (n && avg !== null) ? 'Avg age ' + fmtInt(Math.round(avg)) + ' mo' : 'Avg age —';
+      c.append(l, v, a); return c;
+    };
+    frag.appendChild(mk('Total assets', rows.length, tot.k ? tot.sum / tot.k : null, null, 'total'));
+    for (const d of cl.data) {
+      const g = agg.get(d.name);
+      frag.appendChild(mk(d.name, g ? g.n : 0, g && g.k ? g.sum / g.k : null, classColor(d.name)));
+    }
+    el.replaceChildren(frag);
+  });
+
+  dash.draw('count', (el) => {
+    const all = fa.all();
+    if (!all.length) { el.textContent = '—'; return; }
+    const rows = fa.rows();
+    const ages = rows.map((r) => r.age_months).filter((n) => typeof n === 'number');
+    const avg = ages.length ? Math.round(d3.mean(ages)) : null;
+    el.textContent = 'Showing ' + fmtInt(rows.length) + ' of ' + fmtInt(all.length) + ' assets' + (avg === null ? '' : ' · average age ' + fmtInt(avg) + ' months');
+  });
+
+  dash.draw('rows', (tb) => {
+    const g = dash.data('assets');
+    if (g.status !== 'ok') { tb.replaceChildren(); return; }
+    const rows = fa.rows();
+    const max = d3.max(g.data, (r) => r.age_months) || 1;
+    const frag = document.createDocumentFragment();
+    if (!rows.length) {
+      const tr = document.createElement('tr'); tr.className = 'fa-empty';
+      const td = document.createElement('td'); td.colSpan = COLS.length; td.textContent = 'No assets match these filters.';
+      tr.appendChild(td); frag.appendChild(tr);
+    }
+    const gs = new Map();
+    for (const r of rows) {
+      const g = gs.get(r.asset_class) || { n: 0, sum: 0, k: 0 };
+      g.n++; if (typeof r.age_months === 'number') { g.sum += r.age_months; g.k++; }
+      gs.set(r.asset_class, g);
+    }
+    let lastClass = null;
+    for (const r of rows) {
+      if (r.asset_class !== lastClass) {
+        lastClass = r.asset_class;
+        const g = gs.get(lastClass);
+        const gr = document.createElement('tr'); gr.className = 'fa-grp';
+        const gt = document.createElement('td'); gt.colSpan = COLS.length;
+        const sw = document.createElement('i'); sw.className = 'fa-sw'; sw.style.background = classColor(lastClass);
+        const nmx = document.createElement('b'); nmx.textContent = lastClass;
+        const meta = document.createElement('span'); meta.textContent = fmtInt(g.n) + (g.n === 1 ? ' asset' : ' assets') + (g.k ? ' · average age ' + fmtInt(Math.round(g.sum / g.k)) + ' months' : '');
+        gt.append(sw, nmx, meta); gr.appendChild(gt); frag.appendChild(gr);
+      }
+      const tr = document.createElement('tr');
+      tr.dataset.key = r.asset_number;
+      for (const c of COLS) {
+        const td = document.createElement('td');
+        if (c === 'age_months') {
+          td.className = 'num';
+          const w = document.createElement('span'); w.className = 'fa-age';
+          const tr2 = document.createElement('span'); tr2.className = 'tr';
+          const i = document.createElement('i'); i.style.width = (100 * (r.age_months || 0) / max) + '%';
+          tr2.appendChild(i);
+          const b = document.createElement('b'); b.textContent = (typeof r.age_months === 'number') ? fmtInt(r.age_months) : '';
+          w.append(tr2, b); td.appendChild(w);
+        } else if (c === 'in_service_date') {
+          td.textContent = r.in_service_date ? fmtDate(new Date(r.in_service_date)) : '';
+        } else {
+          td.textContent = r[c] == null ? '' : r[c];
+        }
+        tr.appendChild(td);
+      }
+      frag.appendChild(tr);
+    }
+    tb.replaceChildren(frag);
+  });
+</script>
