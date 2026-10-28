@@ -123,6 +123,28 @@
 .fa-segstats div { display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
 .fa-segstats .l { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
 .fa-segstats .v { font-family: var(--font-anthropic-serif); font-size: 1.6rem; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--mc-accent); }
+
+.fa-tabs { display: flex; gap: .25rem; border-bottom: 2px solid var(--color-border-line); }
+.fa-tab { font: inherit; font-size: var(--cds-font-size-body); font-weight: 600; color: var(--color-fg-muted); background: transparent; border: 0; border-bottom: 3px solid transparent; margin-bottom: -2px; padding: .55rem 1rem; cursor: pointer; }
+.fa-tab:hover { color: var(--color-fg); }
+.fa-tab[aria-selected="true"] { color: var(--mc-accent); border-bottom-color: var(--mc-yellow); }
+.fa-tab:focus-visible { outline: 2px solid var(--mc-accent); outline-offset: -2px; }
+.fa-pane { display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
+.fa-ccards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: var(--cds-gap-md); }
+.fa-ccard { background: var(--color-panel); border: 1px solid var(--color-border-line); border-top: 4px solid var(--cc, var(--mc-yellow)); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+.fa-ccard .l { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.fa-ccard .v { font-family: var(--font-anthropic-serif); font-size: 2rem; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--mc-accent); }
+.fa-ccard .m { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.fa-trend { display: flex; align-items: flex-end; gap: 3px; height: 9rem; padding-top: .5rem; overflow-x: auto; }
+.fa-day { flex: 1 0 1.1rem; max-width: 2.2rem; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 3px; min-width: 0; }
+.fa-day .stk { display: flex; flex-direction: column-reverse; justify-content: flex-start; min-height: 2px; background: rgba(127,127,127,.18); border-radius: 2px 2px 0 0; overflow: hidden; }
+.fa-day .stk i { display: block; width: 100%; }
+.fa-day .dl { font-size: .62rem; color: var(--color-fg-muted); text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fa-clegend { display: flex; flex-wrap: wrap; gap: .25rem .9rem; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.fa-clegend span { display: inline-flex; align-items: center; gap: .35rem; }
+.fa-pill { display: inline-block; padding: .05rem .5rem; border-radius: 999px; font-size: var(--cds-font-size-caption); font-weight: 600; background: var(--pc, #999); color: #14231d; }
+.fa-note-box { background: var(--mc-tint); border-radius: 6px; padding: .6rem .8rem; font-size: var(--cds-font-size-body); }
+.fa [hidden] { display: none !important; }
 </style>
 
 <div class="fa" id="fa-top">
@@ -134,6 +156,12 @@
     </div>
   </header>
 
+  <nav class="fa-tabs" role="tablist" aria-label="Report sections">
+    <button class="fa-tab" id="fa-tabbtn-assets" role="tab" aria-selected="true" aria-controls="fa-pane-assets" type="button" data-pane="assets">Assets</button>
+    <button class="fa-tab" id="fa-tabbtn-changes" role="tab" aria-selected="false" aria-controls="fa-pane-changes" type="button" data-pane="changes">Changes</button>
+  </nav>
+
+  <div class="fa-pane" id="fa-pane-assets" role="tabpanel" aria-labelledby="fa-tabbtn-assets">
   <section class="fa-kpis" id="fa-kpis">
     <div class="fa-kpi"><span class="fa-klabel">Assets</span><span class="fa-kval" data-draw="kpi" data-source="totals" data-row="0" data-field="assets" data-fmt="int">—</span></div>
     <div class="fa-kpi"><span class="fa-klabel">Average age (months)</span><span class="fa-kval" data-draw="kpi" data-source="totals" data-row="0" data-field="avg_age_months" data-fmt="int">—</span></div>
@@ -207,6 +235,60 @@
       </table>
     </div>
   </section>
+  </div>
+
+  <div class="fa-pane" id="fa-pane-changes" role="tabpanel" aria-labelledby="fa-tabbtn-changes" hidden>
+    <section class="fa-card" id="fa-cstatus">
+      <h2>Changes since the last report</h2>
+      <p class="fa-note">Each daily report is compared with the one before it. Changes are kept for 31 days.</p>
+      <p class="fa-note-box" id="fa-c-base" hidden>Tracking starts with the report dated <b data-draw="cfirst" data-source="change_meta" data-row="0" data-field="first_date">—</b>. That report is the starting point, so changes appear after the next daily report.</p>
+      <p class="fa-note-box" id="fa-c-live" hidden>Latest report <b data-draw="clatest" data-source="change_meta" data-row="0" data-field="latest_date">—</b>, compared with <b data-draw="cprev" data-source="change_meta" data-row="0" data-field="previous_date">—</b>. Tracking since <b data-draw="cfirst" data-source="change_meta" data-row="0" data-field="first_date">—</b>.</p>
+      <span data-draw="cstate" data-source="change_meta"></span>
+    </section>
+
+    <section class="fa-ccards" id="fa-ccards">
+      <div class="fa-ccard" style="--cc:#4f9a78"><span class="l">Added</span><span class="v" data-draw="cstat" data-source="change_summary" data-where="change_type=Added" data-ctype="Added" data-cfield="latest">—</span><span class="m">Last 31 days: <b data-draw="cstat" data-source="change_summary" data-where="change_type=Added" data-ctype="Added" data-cfield="month">—</b></span></div>
+      <div class="fa-ccard" style="--cc:#c0392b"><span class="l">Removed</span><span class="v" data-draw="cstat" data-source="change_summary" data-where="change_type=Removed" data-ctype="Removed" data-cfield="latest">—</span><span class="m">Last 31 days: <b data-draw="cstat" data-source="change_summary" data-where="change_type=Removed" data-ctype="Removed" data-cfield="month">—</b></span></div>
+      <div class="fa-ccard" style="--cc:#ffe900"><span class="l">Transferred between stores</span><span class="v" data-draw="cstat" data-source="change_summary" data-where="change_type=Transferred" data-ctype="Transferred" data-cfield="latest">—</span><span class="m">Last 31 days: <b data-draw="cstat" data-source="change_summary" data-where="change_type=Transferred" data-ctype="Transferred" data-cfield="month">—</b></span></div>
+      <div class="fa-ccard" style="--cc:#2f80a8"><span class="l">Status or ownership</span><span class="v" data-draw="cstat" data-source="change_summary" data-where="change_type=Status" data-ctype="Status" data-cfield="latest">—</span><span class="m">Last 31 days: <b data-draw="cstat" data-source="change_summary" data-where="change_type=Status" data-ctype="Status" data-cfield="month">—</b></span></div>
+      <div class="fa-ccard" style="--cc:#8a8f87"><span class="l">Other details</span><span class="v" data-draw="cstat" data-source="change_summary" data-where="change_type=Other" data-ctype="Other" data-cfield="latest">—</span><span class="m">Last 31 days: <b data-draw="cstat" data-source="change_summary" data-where="change_type=Other" data-ctype="Other" data-cfield="month">—</b></span></div>
+    </section>
+
+    <section class="fa-card" id="fa-ctrend-card">
+      <h2>Changes by report day</h2>
+      <p class="fa-note">Each bar is one daily report. Taller bars mean more changes that day. Other details covers template, manufacturer, serial number and in-service date.</p>
+      <div class="fa-clegend"><span><i class="fa-sw" style="background:#4f9a78"></i>Added</span><span><i class="fa-sw" style="background:#c0392b"></i>Removed</span><span><i class="fa-sw" style="background:#ffe900"></i>Transferred</span><span><i class="fa-sw" style="background:#2f80a8"></i>Status or ownership</span><span><i class="fa-sw" style="background:#8a8f87"></i>Other details</span></div>
+      <div class="fa-trend" data-draw="ctrend" data-source="change_runs"></div>
+    </section>
+
+    <section class="fa-card" id="fa-clist">
+      <h2>Change log</h2>
+      <div class="fa-filters">
+        <label class="fa-field" for="fa-c-q">Search<input id="fa-c-q" type="search" placeholder="Asset number, store, detail"></label>
+        <label class="fa-field" for="fa-c-type">Change type<select id="fa-c-type">
+          <option value="">All changes</option><option value="Added">Added</option><option value="Removed">Removed</option><option value="Transferred">Transferred between stores</option><option value="Status">Status or ownership</option><option value="Other">Other details</option>
+        </select></label>
+        <label class="fa-field" for="fa-c-date">Report date<select id="fa-c-date" data-draw="cdate" data-source="change_runs"></select></label>
+        <button class="fa-clear" id="fa-c-clear" type="button">Clear filters</button>
+      </div>
+      <div class="fa-count" data-draw="ccount" data-source="change_events">—</div>
+      <div class="fa-scroll">
+        <table class="fa-table" id="fa-ctable" data-source="change_events" data-row-key="event_id">
+          <thead><tr>
+            <th data-field="date">Report date</th>
+            <th data-field="change_type">Change</th>
+            <th data-field="asset_number">Asset number</th>
+            <th data-field="asset_class">Asset class</th>
+            <th data-field="asset_name">Asset template name</th>
+            <th data-field="store">Store</th>
+            <th data-field="region">Region</th>
+            <th data-field="detail">Detail</th>
+          </tr></thead>
+          <tbody data-draw="crows"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 </div>
 
 <script>
@@ -584,6 +666,133 @@
         } else {
           td.textContent = r[c] == null ? '' : r[c];
         }
+        tr.appendChild(td);
+      }
+      frag.appendChild(tr);
+    }
+    tb.replaceChildren(frag);
+  });
+
+  // ---- Changes tab ----
+  const fc = window.fc = { type: '', date: '', q: '' };
+  const CT_COLORS = { Added: '#4f9a78', Removed: '#c0392b', Transferred: '#ffe900', Status: '#2f80a8', Other: '#8a8f87' };
+  const CT_LABELS = { Added: 'Added', Removed: 'Removed', Transferred: 'Transferred', Status: 'Status or ownership', Other: 'Other details' };
+  fc.events = () => { const g = dash.data('change_events'); return g.status === 'ok' ? g.data : []; };
+  fc.rows = () => fc.events().filter((e) => (!fc.type || e.change_type === fc.type) && (!fc.date || e.date === fc.date) &&
+    (!fc.q || (e.asset_number + ' ' + e.store + ' ' + e.detail + ' ' + e.asset_name + ' ' + e.asset_class + ' ' + e.region).toLowerCase().includes(fc.q)))
+    .sort((a, b) => b.date.localeCompare(a.date) || a.change_type.localeCompare(b.change_type) || String(a.asset_number).localeCompare(String(b.asset_number), 'en', { numeric: true }));
+  fc.refresh = () => { dash.draw('crows'); dash.draw('ccount'); };
+
+  // Tabs
+  document.querySelectorAll('.fa-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.fa-tab').forEach((b) => b.setAttribute('aria-selected', b === btn ? 'true' : 'false'));
+      document.querySelectorAll('.fa-pane').forEach((p) => { p.hidden = (p.id !== 'fa-pane-' + btn.dataset.pane); });
+    });
+  });
+  document.getElementById('fa-c-q').addEventListener('input', (e) => { fc.q = e.target.value.trim().toLowerCase(); fc.refresh(); });
+  document.getElementById('fa-c-type').addEventListener('change', (e) => { fc.type = e.target.value; fc.refresh(); });
+  document.getElementById('fa-c-date').addEventListener('change', (e) => { fc.date = e.target.value; fc.refresh(); });
+  document.getElementById('fa-c-clear').addEventListener('click', () => {
+    fc.type = ''; fc.date = ''; fc.q = '';
+    document.getElementById('fa-c-q').value = ''; document.getElementById('fa-c-type').value = ''; document.getElementById('fa-c-date').value = '';
+    fc.refresh();
+  });
+
+  dash.calc('change_meta', {
+    title: 'Change tracking dates', description: 'First and latest report dates in the change history, and the report before the latest.',
+    inputs: ['change_runs'],
+    fn: (runs) => {
+      const d = runs.map((r) => r.date).sort();
+      return [{ first_date: d[0] || '', latest_date: d[d.length - 1] || '', previous_date: d.length > 1 ? d[d.length - 2] : '', reports: d.length }];
+    }
+  });
+  dash.calc('change_summary', {
+    title: 'Changes by type', description: 'Changes in the latest report and over the kept history, for each type of change.',
+    inputs: ['change_runs', 'change_events'],
+    fn: (runs, events) => {
+      const latest = runs.map((r) => r.date).sort().pop() || '';
+      return ['Added', 'Removed', 'Transferred', 'Status', 'Other'].map((t) => ({
+        change_type: t,
+        latest: events.filter((e) => e.change_type === t && e.date === latest).length,
+        month: events.filter((e) => e.change_type === t).length
+      }));
+    }
+  });
+
+  dash.draw('cstate', (el) => {
+    const g = dash.data('change_meta');
+    const row = g.status === 'ok' ? g.data[0] : null;
+    const live = !!(row && row.previous_date);
+    const base = document.getElementById('fa-c-base'), lv = document.getElementById('fa-c-live');
+    if (base) base.hidden = !(row && !live);
+    if (lv) lv.hidden = !live;
+  });
+  const dateDraw = (el) => {
+    const g = dash.data('change_meta');
+    const v = g.status === 'ok' && g.data[0] ? g.data[0][el.dataset.field] : '';
+    el.textContent = v ? fmtDate(new Date(v)) : '—';
+  };
+  dash.draw('cfirst', dateDraw); dash.draw('clatest', dateDraw); dash.draw('cprev', dateDraw);
+
+  dash.draw('cstat', (el) => {
+    const g = dash.data('change_summary');
+    const row = g.status === 'ok' ? g.data.find((r) => r.change_type === el.dataset.ctype) : null;
+    el.textContent = row ? fmtInt(row[el.dataset.cfield]) : '—';
+  });
+
+  dash.draw('ctrend', (el) => {
+    const g = dash.data('change_runs');
+    if (g.status !== 'ok') { el.replaceChildren(); return; }
+    const days = g.data.slice().sort((a, b) => a.date.localeCompare(b.date));
+    const tot = (r) => r.added + r.removed + r.transferred + r.status + r.other;
+    const max = Math.max(1, ...days.map(tot));
+    const H = 100;
+    const frag = document.createDocumentFragment();
+    for (const r of days) {
+      const day = document.createElement('div'); day.className = 'fa-day';
+      const stk = document.createElement('div'); stk.className = 'stk';
+      const parts = [['Added', r.added], ['Removed', r.removed], ['Transferred', r.transferred], ['Status', r.status], ['Other', r.other]];
+      stk.style.height = (tot(r) ? Math.max(4, H * tot(r) / max) : 2) + 'px';
+      for (const [k, n] of parts) { if (!n) continue; const i = document.createElement('i'); i.style.height = (100 * n / tot(r)) + '%'; i.style.background = CT_COLORS[k]; stk.appendChild(i); }
+      stk.title = fmtDate(new Date(r.date)) + ': ' + (r.baseline ? 'starting point, ' + fmtInt(r.assets) + ' assets' : fmtInt(tot(r)) + ' changes, ' + fmtInt(r.assets) + ' assets');
+      const dl = document.createElement('div'); dl.className = 'dl'; dl.textContent = r.date.slice(5).replace('-', '/');
+      day.append(stk, dl); frag.appendChild(day);
+    }
+    el.replaceChildren(frag);
+  });
+
+  dash.draw('cdate', (sel) => {
+    const g = dash.data('change_runs');
+    if (g.status !== 'ok') { sel.replaceChildren(new Option('All dates', '')); return; }
+    const dates = g.data.map((r) => r.date).sort().reverse();
+    sel.replaceChildren(new Option('All dates', ''), ...dates.map((d) => new Option(fmtDate(new Date(d)), d)));
+    sel.value = fc.date;
+  });
+
+  dash.draw('ccount', (el) => {
+    const all = fc.events();
+    const rows = fc.rows();
+    el.textContent = all.length ? 'Showing ' + fmtInt(rows.length) + ' of ' + fmtInt(all.length) + ' changes' : 'No changes recorded yet';
+  });
+
+  dash.draw('crows', (tb) => {
+    const g = dash.data('change_events');
+    if (g.status !== 'ok') { tb.replaceChildren(); return; }
+    const rows = fc.rows();
+    const frag = document.createDocumentFragment();
+    if (!rows.length) {
+      const tr = document.createElement('tr'); tr.className = 'fa-empty';
+      const td = document.createElement('td'); td.colSpan = 8; td.textContent = g.data.length ? 'No changes match these filters.' : 'No changes recorded yet.';
+      tr.appendChild(td); frag.appendChild(tr);
+    }
+    for (const r of rows) {
+      const tr = document.createElement('tr'); tr.dataset.key = r.event_id;
+      for (const c of ['date', 'change_type', 'asset_number', 'asset_class', 'asset_name', 'store', 'region', 'detail']) {
+        const td = document.createElement('td');
+        if (c === 'date') td.textContent = fmtDate(new Date(r.date));
+        else if (c === 'change_type') { const p = document.createElement('span'); p.className = 'fa-pill'; p.style.setProperty('--pc', CT_COLORS[r.change_type] || '#999'); p.textContent = CT_LABELS[r.change_type] || r.change_type; td.appendChild(p); }
+        else td.textContent = r[c] == null ? '' : r[c];
         tr.appendChild(td);
       }
       frag.appendChild(tr);

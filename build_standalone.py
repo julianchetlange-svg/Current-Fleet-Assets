@@ -1,11 +1,14 @@
 """Build a self-contained index.html (page + data + small runtime) so the report works from GitHub Pages
-or any static host.  usage: build_standalone.py report_page.html assets.json index.html"""
+or any static host.
+usage: build_standalone.py report_page.html assets.json index.html [change_runs=change_runs.json change_events=change_events.json]"""
 import sys, json
 
 page, data, out = sys.argv[1:4]
+extra = dict(a.split('=', 1) for a in sys.argv[4:])
 frag = open(page, encoding='utf-8').read().replace('<meta name="dash-one-writer">', '')
 rows = json.load(open(data, encoding='utf-8'))
 payload = json.dumps(rows, separators=(',', ':')).replace('</', '<\\/')
+extra_tags = ''.join('<script type="application/json" data-ds="%s">%s</script>\n' % (k, json.dumps(json.load(open(v, encoding='utf-8')), separators=(',', ':')).replace('</', '<\\/')) for k, v in extra.items())
 
 HEAD = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -45,6 +48,7 @@ const d3 = (() => {
 })();
 const dash = (() => {
   const store = { assets: { status: 'ok', data: JSON.parse(document.getElementById('assets-data').textContent) } };
+  document.querySelectorAll('script[data-ds]').forEach((s) => { store[s.dataset.ds] = { status: 'ok', data: JSON.parse(s.textContent) }; });
   const draws = new Map();
   const run = (name) => { const fn = draws.get(name); if (fn) document.querySelectorAll('[data-draw="' + name + '"]').forEach((el) => fn(el)); };
   return {
@@ -57,4 +61,4 @@ const dash = (() => {
 </script>
 """
 TAIL = "\n<script>dash.runAll();</script>\n</div>\n</body></html>\n"
-open(out, 'w', encoding='utf-8').write(HEAD + SHIM.replace('__DATA__', payload) + "\n" + frag + TAIL)
+open(out, 'w', encoding='utf-8').write(HEAD + extra_tags + SHIM.replace('__DATA__', payload) + "\n" + frag + TAIL)
